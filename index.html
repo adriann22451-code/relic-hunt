@@ -23,7 +23,7 @@ const AN={w_idle:{n:8,fw:192,fps:8,l:1,fo:41},w_run:{n:6,fw:192,fps:12,l:1,fo:41
 m_idle:{n:12,fw:320,fps:10,l:1,fo:38},m_run:{n:6,fw:320,fps:10,l:1,fo:38},m_atk:{n:3,fw:320,fps:10,fo:38}};
 const NM={bone:'Tulang Ekor',skull:'Tengkorak',meat:'Daging Monster',eye:'Mata Monster',feather:'Bulu'};
 const IM={},tc=document.createElement('canvas'),tx=tc.getContext('2d'),fl=document.createElement('canvas');
-let k=1,P,M,FX,TX,DR,INV,over,ot,shake,hs,state='start',last=0,wantFS=0;
+let k=1,P,M,FX,TX,DR,INV,over,ot,shake,hs,state='menu',last=0,wantFS=0;
 const act={atk:0,dod:0},joy={on:0,x:0,y:0,bx:0,by:0,id:-1},keys={},ptr={};
 const rnd=(a,b)=>a+Math.random()*(b-a),hyp=Math.hypot;
 function fit(){const bw=document.body.clientWidth||innerWidth,bh=document.body.clientHeight||innerHeight;W=Math.max(720,Math.min(1700,Math.round(H*bw/bh)));const s=Math.min(bw/W,bh/H),d=devicePixelRatio||1;cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.width=Math.round(W*s*d);cv.height=Math.round(H*s*d);k=cv.width/W;const g=W>=1150?200:70;AR.w=Math.max(8,Math.floor((W-2*g)/64))*64;AR.x=Math.round((W-AR.w)/2);if(IM.tile&&IM.tile.complete)buildFloor()}
@@ -31,7 +31,7 @@ function cp(){const g=AR.x>=150?AR.x/2:110;return{jx:g,ax:W-g,ay:400,dx:W-g,dy:2
 function goFS(){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:'hide'}):Promise.resolve()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{})}catch(e){}}
 function reset(){P={x:AR.x+200,y:340,hp:100,st:'idle',f:1,t:0,an:'w_idle',at:0,dcd:0,inv:0,hd:0,cb:0,dd:[1,0],fl:0};
 M={x:AR.x+Math.round(AR.w*.72),y:300,hp:400,st:'idle',t:0,f:-1,an:'m_idle',at:0,th:0,tb:0,ld:[-1,0],lh:0,dead:0,fl:0,dt:0};
-FX=[];TX=[];DR=[];INV={};over=0;ot=0;shake=0;hs=0}
+FX=[];TX=[];DR=[];INV=S.mat;RUN={};RT=0;DD=0;HT=0;over=0;ot=0;shake=0;hs=0}
 function setAn(o,n){if(o.an!=n){o.an=n;o.at=0}}
 function fx(key,x,y,s,fps,n,fw){FX.push({key,x,y,s,t:0,fps:fps||16,n:n||8,fw:fw||64})}
 function txt(s,x,y,c){TX.push({s,x,y,c,t:0})}
@@ -45,13 +45,13 @@ else if(act.dod&&P.dcd<=0){P.st='dod';P.t=0;P.dcd=.7;P.inv=.3;P.dd=(x||y)?[x,y]:
 else if(P.st=='atk'){P.x+=x*50*dt;P.y+=y*50*dt;if(!P.hd&&P.t>=.2){P.hd=1;hit()}if(P.t>=.4)P.st='idle'}
 else if(P.st=='dod'){P.x+=P.dd[0]*480*dt;P.y+=P.dd[1]*480*dt;if(P.t>=.22)P.st='idle'}
 clampE(P,30)}
-function hit(){if(M.dead)return;if(hyp(P.x+P.f*45-M.x,P.y-M.y)<125)mHit(12+(P.cb?6:0))}
+function hit(){if(M.dead)return;if(hyp(P.x+P.f*45-M.x,P.y-M.y)<125)mHit(12+(P.cb?6:0)+WP[S.wp].d)}
 function mHit(d){const weak=(P.x-M.x)*M.f<-15&&!M.tb;
 if(weak){d*=2;if(++M.th>=3){M.tb=1;shake=14;txt('EKOR PATAH!',M.x,M.y-120,'#ffa43c');drop('bone',M.x-M.f*80,M.y+20)}}
-if(M.st=='tired')d*=1.5;M.hp-=d;M.fl=1;fx('boom',M.x+rnd(-30,30),M.y-50,.45,20,8,192);
+if(M.st=='tired')d*=1.5;M.hp-=d;DD+=d;M.fl=1;fx('boom',M.x+rnd(-30,30),M.y-50,.45,20,8,192);
 txt((weak?'TITIK LEMAH! ':'')+(d|0),M.x,M.y-110,weak?'#ffe629':'#fff');shake=Math.max(shake,weak?9:5);hs=weak?.07:.05;
 if(M.hp<=0){M.hp=0;M.dead=1;hs=.25;over=1;['skull','meat','eye','feather'].forEach((q,i)=>drop(q,M.x-60+i*40,M.y+50))}}
-function hurt(a){if(P.inv>0||P.st=='dead')return;P.hp-=a;P.inv=.6;P.fl=1;shake=12;hs=.08;const l=hyp(P.x-M.x,P.y-M.y)||1;P.x+=(P.x-M.x)/l*40;P.y+=(P.y-M.y)/l*40;
+function hurt(a){if(P.inv>0||P.st=='dead')return;P.hp-=a;HT++;if(S.vib&&navigator.vibrate)navigator.vibrate(40);P.inv=.6;P.fl=1;shake=12;hs=.08;const l=hyp(P.x-M.x,P.y-M.y)||1;P.x+=(P.x-M.x)/l*40;P.y+=(P.y-M.y)/l*40;
 if(P.hp<=0){P.hp=0;P.st='dead';over=2}}
 function ms(s){M.st=s;M.t=0;if(s=='atk'){M.f=M.ld[0]>0?1:-1;M.an='';setAn(M,'m_atk')}}
 function upM(dt){if(M.dead){M.dt+=dt;return}M.fl=Math.max(0,M.fl-dt*8);if(P.st=='dead'){setAn(M,'m_idle');M.at+=dt;return}
@@ -65,9 +65,9 @@ case'tired':setAn(M,'m_idle');if(M.t>2.2)ms('idle')}
 clampE(M,60)}
 function update(dt){const real=dt;if(hs>0){hs-=real;dt*=.05}
 if(state!='play')return;
-if(over)ot+=real;upP(dt);upM(dt);act.atk=act.dod=0;
+if(over)ot+=real;else RT+=real;upP(dt);upM(dt);act.atk=act.dod=0;if(over&&ot>(over==1?1.8:.9)){finish();return}
 FX.forEach(f=>f.t+=dt);FX=FX.filter(f=>f.t*f.fps<f.n);TX.forEach(t=>t.t+=dt);TX=TX.filter(t=>t.t<.8);
-DR.forEach(d=>d.t+=dt);for(const d of DR.slice()){if(hyp(d.x-P.x,d.y-P.y)<45){INV[d.key]=(INV[d.key]||0)+1;DR.splice(DR.indexOf(d),1);txt('+ '+NM[d.key],P.x,P.y-70,'#9bf59b')}}
+DR.forEach(d=>d.t+=dt);for(const d of DR.slice()){if(hyp(d.x-P.x,d.y-P.y)<45){INV[d.key]=(INV[d.key]||0)+1;RUN[d.key]=(RUN[d.key]||0)+1;save();DR.splice(DR.indexOf(d),1);txt('+ '+NM[d.key],P.x,P.y-70,'#9bf59b')}}
 shake=Math.max(0,shake-40*real)}
 function spr(n,at,x,y,s,flip,col,ca){const a=AN[n];let f=Math.floor(at*a.fps);f=a.l?f%a.n:Math.min(a.n-1,f);let src=IM[n],sx=f*a.fw;
 if(ca>0){tc.width=tc.height=a.fw;tx.imageSmoothingEnabled=false;tx.drawImage(src,sx,0,a.fw,a.fw,0,0,a.fw,a.fw);tx.globalCompositeOperation='source-atop';tx.fillStyle=col;tx.globalAlpha=ca;tx.fillRect(0,0,a.fw,a.fw);tx.globalAlpha=1;tx.globalCompositeOperation='source-over';src=tc;sx=0}
@@ -75,8 +75,8 @@ ctx.save();ctx.translate(x,y-a.fo*s);if(flip)ctx.scale(-1,1);ctx.drawImage(src,s
 function T(s,x,y,sz,c,al){ctx.font='700 '+sz+'px system-ui,sans-serif';ctx.textAlign=al||'left';ctx.lineWidth=4;ctx.strokeStyle='#000';ctx.strokeText(s,x,y);ctx.fillStyle=c||'#fff';ctx.fillText(s,x,y)}
 function bar(x,y,w,h,v,c){ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x-3,y-3,w+6,h+6);ctx.fillStyle=c;ctx.fillRect(x,y,w*Math.max(0,v),h)}
 function btn(x,y,r,l,c,a){ctx.globalAlpha=a;ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.stroke();ctx.globalAlpha=1;T(l,x,y+6,15,'#fff','center')}
-function draw(){ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#47abaa';ctx.fillRect(0,0,W,H);
-ctx.save();if(shake>0)ctx.translate(rnd(-1,1)*shake,rnd(-1,1)*shake);ctx.drawImage(fl,0,0);
+function scene(){ctx.fillStyle='#47abaa';ctx.fillRect(0,0,W,H);
+ctx.save();if(shake>0&&S.shk)ctx.translate(rnd(-1,1)*shake,rnd(-1,1)*shake);ctx.drawImage(fl,0,0);
 DR.forEach(d=>{const b=Math.sin(d.t*5)*3,ic=IM[d.key];ctx.drawImage(ic,d.x-24,d.y-24+b,48,48)});
 const E=[{y:P.y,o:'p'},{y:M.y,o:'m'}].sort((a,b)=>a.y-b.y);
 E.forEach(e=>{const o=e.o=='p'?P:M;ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(o.x,o.y,e.o=='p'?26:48,e.o=='p'?9:14,0,0,7);ctx.fill();
@@ -89,23 +89,63 @@ ctx.restore();
 T('HP',16,30,18);bar(46,16,180,16,P.hp/100,'#3fbf55');
 T('Si Penunggu',W/2,26,18,'#fff','center');bar(W/2-190,36,380,14,M.hp/400,'#d62c2c');
 let s=M.tb?'Ekor patah!':'Ekor '+Math.min(3,M.th)+'/3';if(M.st=='tired'&&!M.dead)s+='  |  Lelah! Serang sekarang!';else if(!M.th&&!M.tb)s+='  |  Serang dari belakang';T(s,W/2,74,15,'#ffe',  'center');
-let ix=16;for(const q in INV){ctx.drawImage(IM[q],ix,50,30,30);T('x'+INV[q],ix+32,72,15);ix+=74}if(ix==16)T('Material: -',16,68,14,'#fff');
-if(state=='play'){if(joy.on){ctx.globalAlpha=.35;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.fill();ctx.globalAlpha=.8;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(joy.bx+joy.x*55,joy.by+joy.y*55,24,0,7);ctx.fill();ctx.globalAlpha=1}
+let ix=16;for(const q in INV){if(!INV[q])continue;ctx.drawImage(IM[q],ix,50,30,30);T('x'+INV[q],ix+32,72,15);ix+=74}if(ix==16)T('Material: -',16,68,14,'#fff');
+T('Bilah: '+WP[S.wp].n,16,104,14,'#ffe');if(state=='play'){B('II',W-60,14,44,44,()=>{state='pause'},'alt');if(joy.on){ctx.globalAlpha=.35;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.fill();ctx.globalAlpha=.8;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(joy.bx+joy.x*55,joy.by+joy.y*55,24,0,7);ctx.fill();ctx.globalAlpha=1}
 else{ctx.globalAlpha=.25;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cp().jx,400,50,0,7);ctx.fill();ctx.globalAlpha=1;T('geser',cp().jx,406,14,'#fff','center')}
 btn(cp().ax,cp().ay,56,'SERANG','#c0392b',.8);btn(cp().dx,cp().dy,44,'GULING','#2c6fbb',P.dcd>0?.35:.8)}
-if(over&&ot>(over==1?1.5:.8)){ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,170,W,200);T(over==1?'BERHASIL BERBURU!':'KALAH…',W/2,250,40,over==1?'#ffe629':'#ff6b6b','center');
-ctx.fillStyle='#e8b339';ctx.fillRect(W/2-120,285,240,56);T('Berburu lagi',W/2,322,24,'#1a1a1a','center')}
-if(state=='start'){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,W,H);T('RELIC HUNT',W/2,210,64,'#ffe629','center');
-T('Patahkan ekor monster, ambil materialnya.',W/2,262,22,'#fff','center');T('Serang dari belakang = titik lemah (damage 2x)',W/2,296,18,'#cfe','center');T('Ketuk layar untuk mulai',W/2,380,26,'#fff','center')}}
-function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,(n-last)/1000||0);last=n;update(dt);draw()}
+}
+let S={mat:{bone:0,skull:0,meat:0,eye:0,feather:0},wp:0,hunts:0,vib:1,shk:1},UI=[],TM=0,RUN={},RT=0,DD=0,HT=0,SUM=null,back='menu';
+try{const q=JSON.parse(localStorage.getItem('relichunt1'));if(q)S=Object.assign(S,q)}catch(e){}
+const WP=[{n:'Pedang Besi',d:0},{n:'Bilah Tulang',d:4,c:{bone:1,skull:1}},{n:'Bilah Pengintai',d:8,c:{bone:2,eye:2}},{n:'Pusaka Penunggu',d:12,c:{skull:2,feather:2,meat:2}}];
+function save(){try{localStorage.setItem('relichunt1',JSON.stringify(S))}catch(e){}}
+function startHunt(){reset();act.atk=act.dod=0;joy.on=0;joy.x=joy.y=0;state='play'}
+function finish(){DR.forEach(d=>{S.mat[d.key]=(S.mat[d.key]||0)+1;RUN[d.key]=(RUN[d.key]||0)+1});DR=[];if(over==1)S.hunts++;save();
+SUM={win:over==1,st:1+(RT<60)+(HT<=2),t:Math.round(RT),dd:Math.round(DD),ht:HT,tb:M.tb,run:Object.assign({},RUN),mp:Math.round(M.hp/4)};state='result'}
+function B(l,x,y,w,h,fn,st){const o=st=='off';UI.push({x,y,w,h,fn,off:o});ctx.fillStyle=o?'#6b6b6b':st=='alt'?'#2c6fbb':'#e8b339';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#1a1a1a';ctx.lineWidth=3;ctx.strokeRect(x,y,w,h);T(l,x+w/2,y+h/2+7,Math.min(22,h*.42),o?'#ddd':st=='alt'?'#fff':'#1a1a1a','center')}
+function PN(x,y,w,h){ctx.fillStyle='rgba(12,28,30,.88)';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#e8b339';ctx.lineWidth=4;ctx.strokeRect(x,y,w,h)}
+function bg(){ctx.fillStyle='#47abaa';ctx.fillRect(0,0,W,H);ctx.drawImage(fl,0,0);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(0,0,W,H)}
+function screens(){const cx=W/2;
+if(state=='menu'){for(const [x,y,w] of [[W*.17,400,34],[W*.83,420,60]]){ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,y,w,w/3,0,0,7);ctx.fill()}
+spr('w_idle',TM,W*.17,400,1.8,false,'#000',0);spr('m_idle',TM,W*.83,420,1.5,true,'#000',0);
+T('RELIC HUNT',cx,128,66,'#ffe629','center');T('Buru monster. Patahkan ekornya. Tempa pusaka.',cx,168,20,'#fff','center');
+[['Mulai berburu',startHunt],['Tempa senjata',()=>{back='menu';state='forge'}],['Cara main',()=>{state='how'}],['Kredit',()=>{state='credits'}]].forEach((b,i)=>B(b[0],cx-150,208+i*66,300,52,b[1],i?'alt':''))}
+else if(state=='how'){PN(cx-330,50,660,440);T('Cara main',cx,100,36,'#ffe629','center');
+['Geser jempol di sisi kiri untuk bergerak.','SERANG untuk menebas, GULING untuk menghindar (kebal sesaat).','Monster berkedip kuning = akan menerjang. Segera guling!','Serang dari belakang = titik lemah, damage 2x.','Tiga kali kena titik lemah, ekor patah dan jatuh Tulang Ekor.','Monster lelah (biru) menerima damage 1,5x.','Kumpulkan material, lalu tempa bilah yang lebih kuat.'].forEach((s,i)=>T(s,cx,152+i*34,17,'#fff','center'));
+B('Kembali',cx-100,420,200,48,()=>{state='menu'},'alt')}
+else if(state=='credits'){PN(cx-300,90,600,340);T('Kredit',cx,140,36,'#ffe629','center');
+['Tiny Swords oleh Pixel Frog','Pixel Art Icon Pack - RPG','Dibuat bersama Claude (Anthropic)','Cek lisensi tiap aset sebelum rilis komersial.'].forEach((s,i)=>T(s,cx,200+i*36,18,'#fff','center'));
+B('Kembali',cx-100,350,200,48,()=>{state='menu'},'alt')}
+else forgeUI()}
+function forgeUI(){const cx=W/2;T('Tempa Senjata',cx,56,38,'#ffe629','center');T('Bilah aktif: '+WP[S.wp].n+'  (+'+WP[S.wp].d+' damage)',cx,90,18,'#fff','center');
+const cw=Math.min(250,(W-80)/3),gap=16,x0=cx-(cw*3+gap*2)/2;
+for(let i=1;i<=3;i++){const w=WP[i],x=x0+(i-1)*(cw+gap),y=110,have=S.wp>=i,ok=S.wp==i-1&&Object.keys(w.c).every(q=>(S.mat[q]||0)>=w.c[q]);
+PN(x,y,cw,310);T(w.n,x+cw/2,y+36,20,'#ffe629','center');T('+'+w.d+' damage',x+cw/2,y+64,17,'#fff','center');T('Bahan:',x+14,y+100,15,'#cfe');
+let r=0;for(const q in w.c){const hv=S.mat[q]||0,nd=w.c[q];ctx.drawImage(IM[q],x+14,y+108+r*44,36,36);T(NM[q],x+56,y+132+r*44,15);T(hv+'/'+nd,x+cw-14,y+132+r*44,17,hv>=nd?'#9bf59b':'#ff8a8a','right');r++}
+B(S.wp==i?'Terpasang':have?'Dimiliki':ok?'Tempa':S.wp<i-1?'Terkunci':'Bahan kurang',x+14,y+252,cw-28,44,()=>{for(const q in w.c)S.mat[q]-=w.c[q];S.wp=i;save()},ok?'':'off')}
+B('Kembali',cx-100,H-82,200,50,()=>{state=back},'alt')}
+function pauseUI(){ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,0,W,H);const cx=W/2;PN(cx-200,50,400,440);T('Jeda',cx,104,40,'#ffe629','center');
+B('Lanjut',cx-150,130,300,50,()=>{state='play'});
+B('Getar: '+(S.vib?'Nyala':'Mati'),cx-150,196,300,46,()=>{S.vib^=1;save()},'alt');
+B('Guncang layar: '+(S.shk?'Nyala':'Mati'),cx-150,254,300,46,()=>{S.shk^=1;save()},'alt');
+B('Ulangi perburuan',cx-150,312,300,46,startHunt,'alt');B('Menu utama',cx-150,370,300,46,()=>{state='menu'},'alt')}
+function resultUI(){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,W,H);const cx=W/2,m=SUM;PN(cx-300,40,600,460);
+T(m.win?'BERHASIL BERBURU!':'KALAH…',cx,100,38,m.win?'#ffe629':'#ff6b6b','center');
+if(m.win)T('★'.repeat(m.st)+'☆'.repeat(3-m.st),cx,146,34,'#ffd24a','center');
+(m.win?['Waktu: '+m.t+' dtk','Damage diberikan: '+m.dd,'Terkena serangan: '+m.ht+' kali','Ekor: '+(m.tb?'patah':'utuh')]:['Sisa HP monster: '+m.mp+'%','Waktu bertahan: '+m.t+' dtk']).forEach((s,i)=>T(s,cx,196+i*28,18,'#fff','center'));
+if(m.win){T('Material didapat:',cx,320,16,'#cfe','center');const ks=Object.keys(m.run),x=cx-ks.length*40;ks.forEach((q,i)=>{ctx.drawImage(IM[q],x+i*80+4,330,32,32);T('x'+m.run[q],x+i*80+40,356,16)})}
+const bw=170,y=412;B(m.win?'Berburu lagi':'Coba lagi',cx-bw*1.5-10,y,bw,50,startHunt);B('Tempa',cx-bw/2,y,bw,50,()=>{back='result';state='forge'},'alt');B('Menu',cx+bw/2+10,y,bw,50,()=>{state='menu'},'alt')}
+function draw(){ctx.setTransform(k,0,0,k,0,0);ctx.imageSmoothingEnabled=false;UI=[];
+if(state=='menu'||state=='how'||state=='credits'||state=='forge'){bg();screens()}else{scene();if(state=='pause')pauseUI();if(state=='result')resultUI()}}
+addEventListener('visibilitychange',()=>{if(document.hidden&&state=='play')state='pause'});
+function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,(n-last)/1000||0);last=n;TM+=dt;update(dt);draw()}
 function lp(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
-cv.addEventListener('pointerdown',e=>{e.preventDefault();const[x,y]=lp(e);if(state=='start'){state='play';wantFS=1;return}
-if(over&&ot>(over==1?1.5:.8)&&Math.abs(x-W/2)<120&&y>285&&y<341){reset();return}
+cv.addEventListener('pointerdown',e=>{e.preventDefault();const[x,y]=lp(e);for(let i=UI.length-1;i>=0;i--){const b=UI[i];if(!b.off&&x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){if(!document.fullscreenElement)wantFS=1;b.fn();return}}
+if(state!='play')return;
 if(hyp(x-cp().ax,y-cp().ay)<70)act.atk=1;else if(hyp(x-cp().dx,y-cp().dy)<55)act.dod=1;
 else if(x<W/2&&!joy.on){joy.on=1;joy.id=e.pointerId;joy.bx=x;joy.by=y;joy.x=joy.y=0}else if(x>=W/2)act.atk=1});
 cv.addEventListener('pointermove',e=>{if(joy.on&&e.pointerId==joy.id){const[x,y]=lp(e);joy.x=Math.max(-1,Math.min(1,(x-joy.bx)/55));joy.y=Math.max(-1,Math.min(1,(y-joy.by)/55))}});
 const up=e=>{if(wantFS){wantFS=0;goFS()}if(e.pointerId==joy.id){joy.on=0;joy.x=joy.y=0}};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-addEventListener('keydown',e=>{const q=e.key.toLowerCase();keys[q]=1;if(state=='start'){state='play';return}if(q=='j'||q==' ')act.atk=1;if(q=='k'||q=='shift')act.dod=1;if(q=='r')reset();if(q==' '||q.startsWith('arrow'))e.preventDefault()});
+addEventListener('keydown',e=>{const q=e.key.toLowerCase();keys[q]=1;if(q=='p'||q=='escape'){if(state=='play')state='pause';else if(state=='pause')state='play'}if(q=='j'||q==' ')act.atk=1;if(q=='k'||q=='shift')act.dod=1;if(q=='r'&&state=='play')startHunt();if(q==' '||q.startsWith('arrow'))e.preventDefault()});
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
 addEventListener('resize',fit);cv.addEventListener('contextmenu',e=>e.preventDefault());
 const ks=Object.keys(A);let ld=0;ks.forEach(n=>{const i=new Image();i.onload=()=>{if(++ld==ks.length)init()};i.src=A[n];IM[n]=i});
