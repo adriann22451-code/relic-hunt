@@ -25,8 +25,8 @@ let k=1,P,M,FX,TX,DR,INV,over,ot,shake,hs,state='start',last=0;
 const act={atk:0,dod:0},joy={on:0,x:0,y:0,bx:0,by:0,id:-1},keys={},ptr={};
 const rnd=(a,b)=>a+Math.random()*(b-a),hyp=Math.hypot;
 function fit(){const s=Math.min(innerWidth/W,innerHeight/H),d=devicePixelRatio||1;cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.width=Math.round(W*s*d);cv.height=Math.round(H*s*d);k=cv.width/W}
-function reset(){P={x:300,y:340,hp:100,st:'idle',f:1,t:0,an:'',at:0,dcd:0,inv:0,hd:0,cb:0,dd:[1,0],fl:0};
-M={x:660,y:300,hp:400,st:'idle',t:0,f:-1,an:'',at:0,th:0,tb:0,ld:[-1,0],lh:0,dead:0,fl:0,dt:0};
+function reset(){P={x:300,y:340,hp:100,st:'idle',f:1,t:0,an:'w_idle',at:0,dcd:0,inv:0,hd:0,cb:0,dd:[1,0],fl:0};
+M={x:660,y:300,hp:400,st:'idle',t:0,f:-1,an:'m_idle',at:0,th:0,tb:0,ld:[-1,0],lh:0,dead:0,fl:0,dt:0};
 FX=[];TX=[];DR=[];INV={};over=0;ot=0;shake=0;hs=0}
 function setAn(o,n){if(o.an!=n){o.an=n;o.at=0}}
 function fx(key,x,y,s,fps,n,fw){FX.push({key,x,y,s,t:0,fps:fps||16,n:n||8,fw:fw||64})}
@@ -93,7 +93,7 @@ if(over&&ot>(over==1?1.5:.8)){ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,170
 ctx.fillStyle='#e8b339';ctx.fillRect(W/2-120,285,240,56);T('Berburu lagi',W/2,322,24,'#1a1a1a','center')}
 if(state=='start'){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,W,H);T('RELIC HUNT',W/2,210,64,'#ffe629','center');
 T('Patahkan ekor monster, ambil materialnya.',W/2,262,22,'#fff','center');T('Serang dari belakang = titik lemah (damage 2x)',W/2,296,18,'#cfe','center');T('Ketuk layar untuk mulai',W/2,380,26,'#fff','center')}}
-function loop(n){const dt=Math.min(.05,(n-last)/1000||0);last=n;update(dt);draw();requestAnimationFrame(loop)}
+function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,(n-last)/1000||0);last=n;update(dt);draw()}
 function lp(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();const[x,y]=lp(e);if(state=='start'){state='play';return}
 if(over&&ot>(over==1?1.5:.8)&&Math.abs(x-W/2)<120&&y>285&&y<341){reset();return}
