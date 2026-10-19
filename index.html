@@ -26,7 +26,8 @@ const IM={},tc=document.createElement('canvas'),tx=tc.getContext('2d'),fl=docume
 let k=1,P,M,FX,TX,DR,INV,over,ot,shake,hs,state='start',last=0,wantFS=0;
 const act={atk:0,dod:0},joy={on:0,x:0,y:0,bx:0,by:0,id:-1},keys={},ptr={};
 const rnd=(a,b)=>a+Math.random()*(b-a),hyp=Math.hypot;
-function fit(){const bw=document.body.clientWidth||innerWidth,bh=document.body.clientHeight||innerHeight;W=Math.max(720,Math.min(1700,Math.round(H*bw/bh)));const s=Math.min(bw/W,bh/H),d=devicePixelRatio||1;cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.width=Math.round(W*s*d);cv.height=Math.round(H*s*d);k=cv.width/W;AR.w=Math.max(12,Math.floor((W-140)/64))*64;AR.x=Math.round((W-AR.w)/2);if(IM.tile&&IM.tile.complete)buildFloor()}
+function fit(){const bw=document.body.clientWidth||innerWidth,bh=document.body.clientHeight||innerHeight;W=Math.max(720,Math.min(1700,Math.round(H*bw/bh)));const s=Math.min(bw/W,bh/H),d=devicePixelRatio||1;cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.width=Math.round(W*s*d);cv.height=Math.round(H*s*d);k=cv.width/W;const g=W>=1150?200:70;AR.w=Math.max(8,Math.floor((W-2*g)/64))*64;AR.x=Math.round((W-AR.w)/2);if(IM.tile&&IM.tile.complete)buildFloor()}
+function cp(){const g=AR.x>=150?AR.x/2:110;return{jx:g,ax:W-g,ay:400,dx:W-g,dy:270}}
 function goFS(){try{const d=document.documentElement;(d.requestFullscreen?d.requestFullscreen({navigationUI:'hide'}):Promise.resolve()).then(()=>screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape')).catch(()=>{})}catch(e){}}
 function reset(){P={x:AR.x+200,y:340,hp:100,st:'idle',f:1,t:0,an:'w_idle',at:0,dcd:0,inv:0,hd:0,cb:0,dd:[1,0],fl:0};
 M={x:AR.x+Math.round(AR.w*.72),y:300,hp:400,st:'idle',t:0,f:-1,an:'m_idle',at:0,th:0,tb:0,ld:[-1,0],lh:0,dead:0,fl:0,dt:0};
@@ -90,8 +91,8 @@ T('Si Penunggu',W/2,26,18,'#fff','center');bar(W/2-190,36,380,14,M.hp/400,'#d62c
 let s=M.tb?'Ekor patah!':'Ekor '+Math.min(3,M.th)+'/3';if(M.st=='tired'&&!M.dead)s+='  |  Lelah! Serang sekarang!';else if(!M.th&&!M.tb)s+='  |  Serang dari belakang';T(s,W/2,74,15,'#ffe',  'center');
 let ix=16;for(const q in INV){ctx.drawImage(IM[q],ix,50,30,30);T('x'+INV[q],ix+32,72,15);ix+=74}if(ix==16)T('Material: -',16,68,14,'#fff');
 if(state=='play'){if(joy.on){ctx.globalAlpha=.35;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.fill();ctx.globalAlpha=.8;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(joy.bx+joy.x*55,joy.by+joy.y*55,24,0,7);ctx.fill();ctx.globalAlpha=1}
-else{ctx.globalAlpha=.25;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(110,430,50,0,7);ctx.fill();ctx.globalAlpha=1;T('geser',110,436,14,'#fff','center')}
-btn(W-120,430,52,'SERANG','#c0392b',.8);btn(W-220,482,38,'GULING','#2c6fbb',P.dcd>0?.35:.8)}
+else{ctx.globalAlpha=.25;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cp().jx,400,50,0,7);ctx.fill();ctx.globalAlpha=1;T('geser',cp().jx,406,14,'#fff','center')}
+btn(cp().ax,cp().ay,56,'SERANG','#c0392b',.8);btn(cp().dx,cp().dy,44,'GULING','#2c6fbb',P.dcd>0?.35:.8)}
 if(over&&ot>(over==1?1.5:.8)){ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,170,W,200);T(over==1?'BERHASIL BERBURU!':'KALAH…',W/2,250,40,over==1?'#ffe629':'#ff6b6b','center');
 ctx.fillStyle='#e8b339';ctx.fillRect(W/2-120,285,240,56);T('Berburu lagi',W/2,322,24,'#1a1a1a','center')}
 if(state=='start'){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,W,H);T('RELIC HUNT',W/2,210,64,'#ffe629','center');
@@ -100,7 +101,7 @@ function loop(n){requestAnimationFrame(loop);const dt=Math.min(.05,(n-last)/1000
 function lp(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
 cv.addEventListener('pointerdown',e=>{e.preventDefault();const[x,y]=lp(e);if(state=='start'){state='play';wantFS=1;return}
 if(over&&ot>(over==1?1.5:.8)&&Math.abs(x-W/2)<120&&y>285&&y<341){reset();return}
-if(hyp(x-(W-120),y-430)<70)act.atk=1;else if(hyp(x-(W-220),y-482)<55)act.dod=1;
+if(hyp(x-cp().ax,y-cp().ay)<70)act.atk=1;else if(hyp(x-cp().dx,y-cp().dy)<55)act.dod=1;
 else if(x<W/2&&!joy.on){joy.on=1;joy.id=e.pointerId;joy.bx=x;joy.by=y;joy.x=joy.y=0}else if(x>=W/2)act.atk=1});
 cv.addEventListener('pointermove',e=>{if(joy.on&&e.pointerId==joy.id){const[x,y]=lp(e);joy.x=Math.max(-1,Math.min(1,(x-joy.bx)/55));joy.y=Math.max(-1,Math.min(1,(y-joy.by)/55))}});
 const up=e=>{if(wantFS){wantFS=0;goFS()}if(e.pointerId==joy.id){joy.on=0;joy.x=joy.y=0}};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
