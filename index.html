@@ -162,7 +162,7 @@ const BH={castle:[320,256,249],house1:[128,192,173],house2:[128,192,178],house3:
 const DMS={tree1:[192,256,8,241],tree2:[192,256,8,249],tree3:[192,192,8,170],tree4:[192,192,8,168],bush1:[128,128,8,79],bush2:[128,128,8,79],stump1:[192,256,1,240],rock1:[64,64,1,51],rock2:[64,64,1,51],rock3:[64,64,1,51],tool1:[64,64,1,45],tool2:[64,64,1,45]};
 const dim=k=>DMS[k]||[BH[k][0],BH[k][1],1,BH[k][2]],TK=['tree1','tree2','tree3','tree4'],RN=s=>()=>(s=(s*16807)%2147483647)/2147483647;
 let inV=0,DL=null,WD={},MP='v',cam={x:0,y:0},FM=[],SHP=[],BT=null,WPos={x:0,y:0},FD=null,invBack='village';const vg=document.createElement('canvas');
-const NPCV=[{id:'e',n:'Tetua Arunika',k:'n_monk',x:950,y:455},{id:'s',n:'Pandai Besi',k:'n_pawn_h',x:700,y:905},{id:'v',n:'Pemburu Veteran',k:'n_arch',x:1580,y:560},{id:'w',n:'Warga',k:'n_pawn_k',x:1180,y:700},{id:'w',n:'Penjaga Ladang',k:'n_pawn_k',x:520,y:740}];
+const NPCV=[{id:'e',n:'Tetua Arunika',k:'n_monk',x:1300,y:610},{id:'s',n:'Pandai Besi',k:'n_pawn_h',x:880,y:1070},{id:'v',n:'Pemburu Veteran',k:'n_arch',x:1930,y:625},{id:'w',n:'Warga',k:'n_pawn_k',x:1500,y:790},{id:'w',n:'Penjaga Ladang',k:'n_pawn_k',x:1450,y:1180}];
 const INTRO=[['','Desa Arunika dahulu damai, dijaga Pusaka Arunika yang bersinar di balai desa.'],['','Hingga suatu malam pusaka itu pecah menjadi tiga. Para penjaga gerbang berubah menjadi monster.'],['Tetua Arunika','Kau pemburu muda yang tersisa, Nak. Hanya kau yang masih berani menatap mereka.'],['Tetua Arunika','Bicaralah dengan warga dulu, lalu pergilah ke timur. Hutan Kabut menanti di balik gerbang desa.'],['','Geser jempol untuk berjalan. Dekati warga lalu tekan BICARA. Di hutan, monster akan mengejarmu.']];
 const ELD=[[['Tetua Arunika','Pecahan pertama dijaga Si Penunggu di Hutan Kabut. Ia berkeliaran dekat jalan setapak.'],['Tetua Arunika','Pandai Besi bisa menempa bilah dari material monster. Lihat tasmu untuk isi hasil buruan.']],
 [['Tetua Arunika','Satu pecahan kembali bersinar! Hangat sekali rasanya.'],['Tetua Arunika','Kini Raksasa Merah menjaga hutan yang lebih dalam. Kabut pertama sudah terbuka untukmu.']],
@@ -185,42 +185,43 @@ return f.createPattern(c,'repeat')}
 function gravel(f){const c=document.createElement('canvas');c.width=c.height=64;const q=c.getContext('2d'),rn=RN(33),pal=['#b5ab94','#9d937c','#7f755f','#a89f88','#6b624f','#948a73'];q.fillStyle='#8b8068';q.fillRect(0,0,64,64);
 for(let i=0;i<170;i++){const x=Math.floor(rn()*64),y=Math.floor(rn()*64),w=2+Math.floor(rn()*3),h=2+Math.floor(rn()*2),col=pal[Math.floor(rn()*6)];for(const ox of [0,-64])for(const oy of [0,-64]){q.fillStyle='rgba(0,0,0,.3)';q.fillRect(x+ox,y+oy+h,w,1);q.fillStyle=col;q.fillRect(x+ox,y+oy,w,h);q.fillStyle='rgba(255,255,255,.14)';q.fillRect(x+ox,y+oy,w,1)}}
 return f.createPattern(c,'repeat')}
-function dpath(f,pts,r,pat,edge){const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x0=Math.floor(Math.min(...xs)-r-8),y0=Math.floor(Math.min(...ys)-r-8),x1=Math.ceil(Math.max(...xs)+r+8),y1=Math.ceil(Math.max(...ys)+r+8);
-const circ=(c,rr)=>{for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],n=Math.max(1,Math.ceil(hyp(b[0]-a[0],b[1]-a[1])/10));for(let j=0;j<=n;j++){c.beginPath();c.arc(a[0]+(b[0]-a[0])*j/n-x0,a[1]+(b[1]-a[1])*j/n-y0,rr,0,7);c.fill()}}};
-const o=document.createElement('canvas');o.width=x1-x0;o.height=y1-y0;const c=o.getContext('2d');c.fillStyle=edge;circ(c,r+5);f.drawImage(o,x0,y0);
-const t=document.createElement('canvas');t.width=o.width;t.height=o.height;const q=t.getContext('2d');q.fillStyle='#000';circ(q,r);q.globalCompositeOperation='source-in';q.setTransform(1,0,0,1,-x0,-y0);q.fillStyle=pat;q.fillRect(x0,y0,t.width,t.height);f.drawImage(t,x0,y0)}
-function worldV(){const w=1900,h=1150,g=document.createElement('canvas');g.width=w;g.height=h;const f=g.getContext('2d');f.imageSmoothingEnabled=false;const rn=RN(5);
-tileFill(f,IM.tile,0,0,w,h);patches(f,w,h,70,rn);
-const PT=[[[950,470],[1000,640],[1900,640]],[[1000,640],[700,820]],[[1000,640],[480,520]],[[950,470],[700,430]],[[1000,640],[1250,900]],[[1640,640],[1640,620]]];
-const CB=cobble(f),EV='rgba(30,28,40,.7)';PT.forEach(p=>dpath(f,p,42,CB,EV));dpath(f,[[960,540],[1040,560]],115,CB,EV);
+function paths(f,RS,pat,edge){const sn=v=>Math.round(v/16)*16,Q=RS.map(r=>{const x0=sn(r[0]),y0=sn(r[1]);return[x0,y0,sn(r[0]+r[2])-x0,sn(r[1]+r[3])-y0]});
+f.fillStyle=edge;Q.forEach(r=>f.fillRect(r[0]-5,r[1]-5,r[2]+10,r[3]+10));f.fillStyle=pat;Q.forEach(r=>f.fillRect(r[0],r[1],r[2],r[3]))}
+const inR=(RS,x,y,m)=>RS.some(r=>x>r[0]-m&&x<r[0]+r[2]+m&&y>r[1]-m&&y<r[1]+r[3]+m);
+function worldV(){const w=2600,h=1500,g=document.createElement('canvas');g.width=w;g.height=h;const f=g.getContext('2d');f.imageSmoothingEnabled=false;const rn=RN(5);
+tileFill(f,IM.tile,0,0,w,h);patches(f,w,h,90,rn);
+const B=[['castle',1300,466,1.35],['mon',620,470,1.1],['barracks',1980,470,1.25],['archery',2330,470,1.2],['house1',520,930,1.5],['rhouse1',900,930,1.5],['yhouse2',1700,930,1.5],['phouse3',2100,930,1.5],['house3',2380,930,1.5],['house2',240,930,1.5],['tower',2570,940,.95],['tower',2570,1080,.95]];
+const RS=[[380,500,2040,90],[1080,466,440,250],[1255,590,90,360],[150,945,2450,90]];
+B.forEach(([k,x,y,s])=>{if(k!='castle'&&k!='tower')RS.push([x-60,y-8,120,(y<700?500:945)-y+10])});
+paths(f,RS,cobble(f),'rgba(30,28,40,.75)');
 const O=[],C=[],R=[],BL=[];
-[['castle',950,400,.85],['mon',480,430,.7],['house1',330,650,.8],['rhouse1',700,860,.8],['yhouse2',1350,390,.85],['phouse3',1450,780,.8],['barracks',1620,450,.7],['archery',1700,920,.7],['house3',1250,900,.8],['tower',1850,560,.6],['tower',1850,740,.6]].forEach(([k,x,y,s])=>{O.push({k,x,y,s,ph:0});BL.push([x,y]);const d=BH[k];R.push([x-d[0]*s*.38,y-55,d[0]*s*.76,55])});
-[['tool1',650,915],['tool2',760,912]].forEach(([k,x,y])=>O.push({k,x,y,s:1,ph:0}));
-[[1790,580],[1790,720],[880,540],[1060,540],[610,905]].forEach(([x,y])=>{O.push({k:'fire',x,y,s:1.5,ph:rn()*3,fire:1});C.push([x,y,12])});
-const far=(x,y)=>PT.every(p=>dseg(x,y,p)>85)&&BL.every(b=>hyp(b[0]-x,b[1]-80-y)>170)&&NPCV.every(n=>hyp(n.x-x,n.y-y)>80);
-const addT=(x,y)=>{O.push({k:TK[Math.floor(rn()*4)],x,y,s:.75+rn()*.2,ph:rn()*8});C.push([x,y,13])};
-for(let x=0;x<w;x+=62)for(const yy of [38,98])addT(x+rn()*24,yy+rn()*20);for(let x=0;x<w;x+=62)addT(x+rn()*24,h-24-rn()*30);
-for(let y=140;y<h-60;y+=66){addT(34+rn()*30,y);addT(94+rn()*30,y);if(y<500||y>780)addT(w-40-rn()*26,y)}
-for(let i=0;i<110;i++){const x=130+rn()*(w-260),y=150+rn()*(h-250);if(far(x,y))addT(x,y)}
-for(let i=0;i<50;i++){const x=120+rn()*(w-240),y=140+rn()*(h-220);if(far(x,y))O.push({k:rn()<.5?'bush1':'bush2',x,y,s:.7,ph:rn()*8})}
-for(let i=0;i<16;i++){const x=120+rn()*(w-240),y=160+rn()*(h-240);if(far(x,y)){O.push({k:'rock'+(1+i%3),x,y,s:.8,ph:0});C.push([x,y,12])}}
-SHP=[[1150,980],[1100,1010],[1250,1040],[1000,1030],[1200,1000]].map(([x,y])=>({x,y,hx:x,hy:y,st:'i',t:rn()*3,f:1,tx:x,ty:y}));
+B.forEach(([k,x,y,s])=>{O.push({k,x,y,s,ph:0});const d=BH[k];BL.push([x,y,d[0]*s*.55+90]);R.push([x-d[0]*s*.38,y-60*s,d[0]*s*.76,60*s])});
+[['tool1',830,1075],['tool2',930,1072]].forEach(([k,x,y])=>O.push({k,x,y,s:1.2,ph:0}));
+[[1060,520],[1540,520],[2520,925],[2520,1055],[1010,1078]].forEach(([x,y])=>{O.push({k:'fire',x,y,s:1.5,ph:rn()*3,fire:1});C.push([x,y,12])});
+const far=(x,y)=>!inR(RS,x,y,70)&&BL.every(b=>hyp(b[0]-x,b[1]-80-y)>b[2])&&NPCV.every(n=>hyp(n.x-x,n.y-y)>90);
+const addT=(x,y)=>{O.push({k:TK[Math.floor(rn()*4)],x,y,s:.95+rn()*.3,ph:rn()*8});C.push([x,y,14])};
+for(let x=0;x<w;x+=70)for(const yy of [38,110])addT(x+rn()*24,yy+rn()*20);for(let x=0;x<w;x+=70)addT(x+rn()*24,h-24-rn()*30);
+for(let y=150;y<h-60;y+=74){addT(34+rn()*30,y);addT(100+rn()*30,y);if(Math.abs(y-990)>115)addT(w-40-rn()*26,y)}
+for(let i=0;i<170;i++){const x=130+rn()*(w-260),y=150+rn()*(h-250);if(far(x,y))addT(x,y)}
+for(let i=0;i<70;i++){const x=120+rn()*(w-240),y=140+rn()*(h-220);if(far(x,y))O.push({k:rn()<.5?'bush1':'bush2',x,y,s:.7,ph:rn()*8})}
+for(let i=0;i<20;i++){const x=120+rn()*(w-240),y=160+rn()*(h-240);if(far(x,y)){O.push({k:'rock'+(1+i%3),x,y,s:.8,ph:0});C.push([x,y,12])}}
+SHP=[[1700,1220],[1780,1270],[1860,1210],[1650,1300],[1900,1320]].map(([x,y])=>({x,y,hx:x,hy:y,st:'i',t:rn()*3,f:1,tx:x,ty:y}));
 O.sort((a,b)=>a.y-b.y);return{w,h,g,o:O,c:C,r:R,name:'Desa Arunika'}}
 function worldF(){const w=3000,h=1700,g=document.createElement('canvas');g.width=w;g.height=h;const f=g.getContext('2d');f.imageSmoothingEnabled=false;const rn=RN(9);
 tileFill(f,IM.tile3,0,0,w,h);patches(f,w,h,130,rn);
-const PT=[[[40,850],[700,850],[1500,850],[1750,700],[2000,650],[2350,800],[2600,1100],[2750,1250]],[[1000,850],[1000,700]],[[1250,850],[1250,1100]],[[1950,650],[1950,500]],[[2050,650],[2050,1050]],[[2350,800],[2650,480]]],MH=[[1000,700],[1250,1100],[1950,500],[2050,1050],[2700,1250],[2650,480]];
-const GR=gravel(f),EF='rgba(60,50,32,.55)';PT.forEach(p=>dpath(f,p,40,GR,EF));MH.forEach(([x,y])=>dpath(f,[[x,y],[x+1,y]],125,GR,EF));dpath(f,[[140,850],[141,850]],95,GR,EF);
-const O=[],C=[];const addT=(x,y)=>{O.push({k:TK[Math.floor(rn()*4)],x,y,s:.8+rn()*.25,ph:rn()*8});C.push([x,y,13])};
-[[1500,850],[2350,800]].forEach(([bx,by])=>{for(let y=40;y<h-20;y+=54)if(Math.abs(y-by)>95)for(const dx of [0,46])addT(bx-20+dx+rn()*14,y+rn()*10)});
+const RS=[[0,810,1740,80],[1660,610,80,280],[1660,610,880,80],[2460,610,80,680],[2460,1210,320,80],[960,660,80,190],[1210,810,80,330],[1910,460,80,190],[2010,610,80,480],[2460,440,80,210],[2460,440,230,80],[60,770,220,160]],MH=[[1000,700],[1250,1100],[1950,500],[2050,1050],[2700,1250],[2650,480]];
+MH.forEach(([x,y])=>RS.push([x-140,y-115,280,230]));paths(f,RS,gravel(f),'rgba(60,50,32,.6)');
+const O=[],C=[];const addT=(x,y)=>{O.push({k:TK[Math.floor(rn()*4)],x,y,s:.85+rn()*.25,ph:rn()*8});C.push([x,y,13])};
+[[1500,850],[2350,650]].forEach(([bx,by])=>{for(let y=40;y<h-20;y+=54)if(Math.abs(y-by)>95)for(const dx of [0,46])addT(bx-20+dx+rn()*14,y+rn()*10)});
 for(let x=0;x<w;x+=58)for(const yy of [40,110])addT(x+rn()*24,yy+rn()*20);for(let x=0;x<w;x+=58)for(const yy of [h-30,h-100])addT(x+rn()*24,yy-rn()*20);
 for(let y=170;y<h-120;y+=62)for(const xx of [30,95]){if(Math.abs(y-850)>95)addT(xx+rn()*26,y)}for(let y=170;y<h-120;y+=62)for(const xx of [w-40,w-105])addT(xx-rn()*26,y);
-const far=(x,y)=>PT.every(p=>dseg(x,y,p)>100)&&MH.every(m=>hyp(m[0]-x,m[1]-y)>190)&&Math.abs(x-1500)>80&&Math.abs(x-2350)>80&&!(x<300&&Math.abs(y-850)<170);
+const far=(x,y)=>!inR(RS,x,y,70)&&Math.abs(x-1500)>80&&Math.abs(x-2350)>80;
 for(let i=0;i<330;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y))addT(x,y)}
-for(let i=0;i<140;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(PT.every(p=>dseg(x,y,p)>55))O.push({k:rn()<.5?'bush1':'bush2',x,y,s:.7,ph:rn()*8})}
+for(let i=0;i<140;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(!inR(RS,x,y,30))O.push({k:rn()<.5?'bush1':'bush2',x,y,s:.7,ph:rn()*8})}
 for(let i=0;i<45;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y)){O.push({k:'rock'+(1+i%3),x,y,s:.8,ph:0});C.push([x,y,12])}}
 for(let i=0;i<12;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y)){O.push({k:'stump1',x,y,s:.5,ph:0});C.push([x,y,14])}}
 O.push({k:'fire',x:140,y:800,s:1.5,ph:0,fire:1});C.push([140,800,12]);
-O.sort((a,b)=>a.y-b.y);return{w,h,g,o:O,c:C,r:[],name:'Hutan Kabut',fog:[{x:1500,y:850,gh:95,need:0},{x:2350,y:800,gh:95,need:1}]}}
+O.sort((a,b)=>a.y-b.y);return{w,h,g,o:O,c:C,r:[],name:'Hutan Kabut',fog:[{x:1500,y:850,gh:95,need:0},{x:2350,y:650,gh:95,need:1}]}}
 function initForest(){FM=[[0,1000,700],[0,1250,1100],[1,1950,500],[1,2050,1050],[2,2700,1250],[2,2650,480]].map(([ty,x,y])=>({ty,x,y,hx:x,hy:y,al:1,rt:0,cd:0,st:'idle',f:-1,at:rnd(0,3),wt:0,wx:x,wy:y,mv:0,ex:0,zx:ty==0?[90,1440]:ty==1?[1570,2290]:[2410,2900]}))}
 function mkMini(M){const mw=520,mh=Math.round(mw*M.h/M.w),s=mw/M.w,c=document.createElement('canvas');c.width=mw;c.height=mh;const q=c.getContext('2d');q.imageSmoothingEnabled=true;q.drawImage(M.g,0,0,mw,mh);
 M.o.forEach(o=>{const x=o.x*s,y=o.y*s;if(o.fire){q.fillStyle='#ff9a3c';q.fillRect(x-2,y-3,4,4)}else if(BH[o.k]){const b=BH[o.k],w=b[0]*o.s*s*.8,h=b[2]*o.s*s*.5;q.fillStyle='#5b3d2b';q.fillRect(x-w/2-1,y-h-1,w+2,h+2);q.fillStyle='#b98a5e';q.fillRect(x-w/2,y-h,w,h*.55)}
@@ -238,7 +239,7 @@ function toWorld(id,x,y,keep){MP=id;inV=1;if(id=='f'&&!keep)initForest();const s
 function fade(txt,cb,col,dur){FD={t:0,dur:dur||.8,cb,txt,col:col||'#000',blk:1,d:0}}
 function encounter(m){BT=m;WPos={x:P.x,y:P.y};fade('! PERTARUNGAN !',()=>startHunt(m.ty),'#fff',1)}
 function backToForest(){if(!BT)return;const w=SUM&&SUM.win;toWorld('f',WPos.x-(w?0:240),WPos.y,1)}
-function enterVillage(){toWorld('v',S.intro?1760:300,S.intro?660:700);if(!S.intro){S.intro=1;save();talk(INTRO)}else if(S.news){S.news=0;save();npcTalk(NPCV[0])}}
+function enterVillage(){toWorld('v',S.intro?2440:360,990);if(!S.intro){S.intro=1;save();talk(INTRO)}else if(S.news){S.news=0;save();npcTalk(NPCV[0])}}
 function near(){let b=null,bd=110;if(MP=='v')NPCV.forEach(n=>{const d=hyp(n.x-P.x,n.y-P.y);if(d<bd){bd=d;b=n}});return b}
 function talk(l,fn){DL={l,i:0,c:0,fn};state='talk'}
 function dlgNext(){if(!DL)return;const s=DL.l[DL.i][1];if(DL.c<s.length){DL.c=s.length;return}DL.i++;DL.c=0;if(DL.i>=DL.l.length){const f=DL.fn;DL=null;state='village';if(f)f()}}
@@ -258,8 +259,8 @@ function vUpdate(dt){if(FD&&FD.blk)return;if(state=='talk'){DL.c+=dt*55;act.atk=
 const n=near();if(act.atk&&n)npcTalk(n);act.atk=act.dod=0;if(state!='village')return;
 wMove(dt);camUpd(dt,0);const M=WD[MP];
 if(MP=='v'){SHP.forEach(s=>{if(s.st=='i'){s.t-=dt;if(s.t<=0){s.st='m';s.tx=s.hx+rnd(-120,120);s.ty=s.hy+rnd(-60,60)}}else{const dx=s.tx-s.x,dy=s.ty-s.y,l=hyp(dx,dy);if(l<5){s.st='i';s.t=rnd(2,5)}else{s.x+=dx/l*30*dt;s.y+=dy/l*30*dt;s.f=dx>0?1:-1}}});
-if(P.x>M.w-45&&Math.abs(P.y-640)<110)fade('Hutan Kabut',()=>toWorld('f',170,850))}
-else{fUpdate(dt);if(P.x<45&&Math.abs(P.y-850)<110&&!FD)fade('Desa Arunika',()=>toWorld('v',1760,660))}}
+if(P.x>M.w-45&&Math.abs(P.y-990)<110)fade('Hutan Kabut',()=>toWorld('f',170,850))}
+else{fUpdate(dt);if(P.x<45&&Math.abs(P.y-850)<110&&!FD)fade('Desa Arunika',()=>toWorld('v',2440,990))}}
 function odraw(o){const d=dim(o.k),f=d[2]>1?Math.floor(TM*6+o.ph)%d[2]:0;ctx.drawImage(IM[o.k],f*d[0],0,d[0],d[1],o.x-d[0]*o.s/2,o.y-d[3]*o.s,d[0]*o.s,d[1]*o.s)}
 function shw(x,y,r){ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(x,y,r,r/3,0,0,7);ctx.fill()}
 function joyDraw(){if(joy.on){ctx.globalAlpha=.35;ctx.fillStyle='#000';ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.fill();ctx.globalAlpha=.8;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(joy.bx+joy.x*55,joy.by+joy.y*55,24,0,7);ctx.fill();ctx.globalAlpha=1}
@@ -284,7 +285,7 @@ ctx.globalCompositeOperation='lighter';M.o.forEach(o=>{if(o.fire&&o.x>x0&&o.x<x1
 for(let i=0;i<26;i++){ctx.globalAlpha=.35+.35*Math.sin(TM*3+i);ctx.fillStyle=MP=='f'?'#c8ff9a':'#ffe9a0';ctx.beginPath();ctx.arc(cam.x+(i*211+TM*(6+i%5*3))%W,cam.y+(i*131)%H+Math.sin(TM*1.3+i)*18,2,0,7);ctx.fill()}
 ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
 if(MP=='f'){M.fog.forEach(g=>{if(S.beat[g.need])return;for(let y=g.y-g.gh;y<g.y+g.gh;y+=24){ctx.globalAlpha=.45+.2*Math.sin(TM*2+y);ctx.fillStyle='#d9d2ff';ctx.beginPath();ctx.ellipse(g.x+Math.sin(TM+y)*6,y,34,26,0,0,7);ctx.fill()}ctx.globalAlpha=1;if(hyp(P.x-g.x,P.y-g.y)<280)T('Kabut tebal! Kalahkan '+MT[g.need].n+' dulu.',g.x,g.y-g.gh-18,16,'#fff','center')});T('◀ Desa Arunika',100,770,15,'#ffe629','center')}
-else T('Hutan Kabut ▶',M.w-110,500,15,'#ffe629','center');
+else T('Hutan Kabut ▶',M.w-110,890,15,'#ffe629','center');
 ctx.restore();if(MP=='f'){ctx.fillStyle='rgba(5,28,22,.18)';ctx.fillRect(0,0,W,H)}ctx.drawImage(vg,0,0);
 const pr=prog();T(M.name,W/2,30,24,'#ffe629','center');T(pr<3?'Tujuan: kalahkan '+MT[pr].n+' di Hutan Kabut':'Tujuan: bebas berburu',W/2,54,15,'#fff','center');mini(14,14,210);
 if(state=='village'){B('II',W-60,14,44,44,()=>{state='pause'},'alt');B('Tas',W-124,14,56,44,openInv,'alt');joyDraw();if(MP=='v')btn(cp().ax,cp().ay,56,'BICARA','#2e8b57',nr?.9:.3)}}
