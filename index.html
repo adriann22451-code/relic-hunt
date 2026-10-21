@@ -238,13 +238,13 @@ MH.forEach(([x,y])=>RS.push([x-140,y-115,280,230]));paths(f,RS,gravel(f),'rgba(6
 const O=[],C=[];const addT=(x,y)=>{O.push({k:TK[Math.floor(rn()*4)],x,y,s:.85+rn()*.25,ph:rn()*8});C.push([x,y,13])};
 [[1500,850],[2350,650],[2900,1250]].forEach(([bx,by])=>{for(let y=40;y<h-20;y+=54)if(Math.abs(y-by)>95)for(const dx of [0,46])addT(bx-20+dx+rn()*14,y+rn()*10)});
 for(let x=0;x<w;x+=58)for(const yy of [40,110])addT(x+rn()*24,yy+rn()*20);for(let x=0;x<w;x+=58)for(const yy of [h-30,h-100])addT(x+rn()*24,yy-rn()*20);
-for(let y=170;y<h-120;y+=62)for(const xx of [30,95]){if(Math.abs(y-850)>95)addT(xx+rn()*26,y)}for(let y=170;y<h-120;y+=62)for(const xx of [w-40,w-105])addT(xx-rn()*26,y);
+for(let y=170;y<h-120;y+=62)for(const xx of [30,95]){if(Math.abs(y-850)>95)addT(xx+rn()*26,y)}for(let y=170;y<h-120;y+=62)for(const xx of [w-40,w-105])if(Math.abs(y-1250)>150)addT(xx-rn()*26,y);
 const far=(x,y)=>!inR(RS,x,y,70)&&Math.abs(x-1500)>80&&Math.abs(x-2350)>80&&Math.abs(x-2900)>80;
 for(let i=0;i<330;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y))addT(x,y)}
 for(let i=0;i<140;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(!inR(RS,x,y,30))O.push({k:rn()<.5?'bush1':'bush2',x,y,s:.7,ph:rn()*8})}
 for(let i=0;i<45;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y)){O.push({k:'rock'+(1+i%3),x,y,s:.8,ph:0});C.push([x,y,12])}}
 for(let i=0;i<12;i++){const x=140+rn()*(w-280),y=170+rn()*(h-300);if(far(x,y)){O.push({k:'stump1',x,y,s:.5,ph:0});C.push([x,y,14])}}
-O.push({k:'fire',x:140,y:800,s:1.5,ph:0,fire:1});C.push([140,800,12]);[[3530,1170],[3530,1330]].forEach(([x,y])=>{O.push({k:'cl_reyes',x,y,s:1.4,ph:0});C.push([x,y-20,34])});
+O.push({k:'fire',x:140,y:800,s:1.5,ph:0,fire:1});C.push([140,800,12]);[[3520,1120],[3520,1380]].forEach(([x,y])=>{O.push({k:'cl_reyes',x,y,s:1.4,ph:0});C.push([x,y-20,34])});
 O.sort((a,b)=>a.y-b.y);return{w,h,g,o:O,c:C,r:[],name:'Hutan Kabut',fog:[{x:1500,y:850,gh:95,need:0},{x:2350,y:650,gh:95,need:1},{x:2900,y:1250,gh:95,need:2}]}}
 const DRM={A:[1,9,7,14],B:[12,7,22,16],C:[27,3,37,12],D:[10,21,26,24],E:[27,15,37,20],F:[41,13,46,22],G:[2,19,6,23],H:[14,1,19,4]};
 const DCOR=[[0,11,0,12],[8,11,11,12],[23,11,26,12],[17,17,18,20],[32,13,33,14],[38,17,40,18],[4,15,5,18],[16,5,17,6]];
@@ -340,7 +340,7 @@ L.sort((a,b)=>a.y-b.y);L.forEach(e=>e.d());
 ctx.globalCompositeOperation='lighter';M.o.forEach(o=>{if(o.fire&&o.x>x0&&o.x<x1){const g=ctx.createRadialGradient(o.x,o.y-24,4,o.x,o.y-24,130);g.addColorStop(0,'rgba(255,170,60,.38)');g.addColorStop(1,'rgba(255,120,0,0)');ctx.fillStyle=g;ctx.fillRect(o.x-135,o.y-160,270,270)}});
 for(let i=0;i<26;i++){ctx.globalAlpha=.35+.35*Math.sin(TM*3+i);ctx.fillStyle=MP=='f'?'#c8ff9a':'#ffe9a0';ctx.beginPath();ctx.arc(cam.x+(i*211+TM*(6+i%5*3))%W,cam.y+(i*131)%H+Math.sin(TM*1.3+i)*18,2,0,7);ctx.fill()}
 ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-if(MP=='f'){M.fog.forEach(g=>{if(S.beat[g.need])return;for(let y=g.y-g.gh;y<g.y+g.gh;y+=24){ctx.globalAlpha=.45+.2*Math.sin(TM*2+y);ctx.fillStyle='#d9d2ff';ctx.beginPath();ctx.ellipse(g.x+Math.sin(TM+y)*6,y,34,26,0,0,7);ctx.fill()}ctx.globalAlpha=1;if(hyp(P.x-g.x,P.y-g.y)<280)T('Kabut tebal! Kalahkan '+MT[g.need].n+' dulu.',g.x,g.y-g.gh-18,16,'#fff','center')});T('◀ Desa Arunika',100,770,15,'#ffe629','center');T('Gua Terkutuk ▶',M.w-110,1170,15,'#ff9aa8','center')}
+if(MP=='f'){M.fog.forEach(g=>{if(S.beat[g.need])return;for(let y=g.y-g.gh;y<g.y+g.gh;y+=24){ctx.globalAlpha=.45+.2*Math.sin(TM*2+y);ctx.fillStyle='#d9d2ff';ctx.beginPath();ctx.ellipse(g.x+Math.sin(TM+y)*6,y,34,26,0,0,7);ctx.fill()}ctx.globalAlpha=1;if(hyp(P.x-g.x,P.y-g.y)<280)T('Kabut tebal! Kalahkan '+MT[g.need].n+' dulu.',g.x,g.y-g.gh-18,16,'#fff','center')});T('◀ Desa Arunika',100,770,15,'#ffe629','center');T('Gua Terkutuk ▶',M.w-110,1100,15,'#ff9aa8','center')}
 else if(MP=='v')T('Hutan Kabut ▶',M.w-110,890,15,'#ffe629','center');else T('◀ Hutan Kabut',110,690,15,'#ffe629','center');
 ctx.restore();if(MP=='f'){ctx.fillStyle='rgba(5,28,22,.18)';ctx.fillRect(0,0,W,H)}if(MP=='d')darkDraw(M);ctx.drawImage(vg,0,0);
 const pr=prog();T(M.name,W/2,30,24,'#ffe629','center');T(MP=='d'?'Tujuan: kalahkan Cacodaemon di ruang terdalam':pr<3?'Tujuan: kalahkan '+MT[pr].n+' di Hutan Kabut':S.beat[3]?(S.beat[8]?'Tujuan: bebas berburu':'Tujuan: jelajahi Gua Terkutuk'):'Tujuan: kalahkan Minotaur Penjaga',W/2,54,15,'#fff','center');mini(14,14,210);if(TO)T(TO.s,W/2,H-200,18,'#ffe629','center');
