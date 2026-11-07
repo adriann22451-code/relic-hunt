@@ -1,5 +1,5 @@
 // Relic Hunt service worker — naikkan VERSION setiap kali index.html diubah
-const VERSION = 'relic-hunt-v1';
+const VERSION = 'relic-hunt-v2';
 const FILES = ['./', './index.html', './manifest.json', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
