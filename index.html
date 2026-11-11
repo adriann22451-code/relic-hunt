@@ -117,9 +117,15 @@ if(over)ot+=real;else RT+=real;upP(dt);upM(dt);upA(dt);upPA(dt);dotP(dt);act.atk
 FX.forEach(f=>f.t+=dt);FX=FX.filter(f=>f.t*f.fps<f.n);TX.forEach(t=>t.t+=dt);TX=TX.filter(t=>t.t<.8);
 DR.forEach(d=>d.t+=dt);for(const d of DR.slice()){if(hyp(d.x-P.x,d.y-P.y)<45){INV[d.key]=(INV[d.key]||0)+1;RUN[d.key]=(RUN[d.key]||0)+1;S.st.m++;save();sfx('pick');DR.splice(DR.indexOf(d),1);txt('+ '+NM[d.key],P.x,P.y-70,'#9bf59b')}}
 shake=Math.max(0,shake-40*real)}
+function fxT(k,t,s,fo){let dx=0,dy=0,r=0,sx=1,sy=1;
+if(k=='idle'){sy=1+.022*Math.sin(t*5);sx=1/sy}
+else if(k=='run'){const p=Math.abs(Math.sin(t*9)),q=1-p;dy=-p*9;sy=1-.06*q;sx=1+.06*q;r=.1+.03*Math.sin(t*9)}
+else if(k=='wind'){dx=Math.sin(t*70)*1.6;dy=-Math.min(8,t*20);const g=1+Math.min(.14,t*.35);sx=sy=g;r=-.1}
+else if(k=='atk'){const u=Math.min(1,t/.12),v=Math.min(1,Math.max(0,(t-.12)/.18)),w=Math.min(1,Math.max(0,(t-.3)/.3));r=-.12*u*(1-v)+.34*v*(1-.6*w);const g=1+.1*v*(1-w);sx=sy=g;dx=6*v*(1-w);dy=-3*v}
+ctx.translate(dx,fo*s+dy);ctx.rotate(r);ctx.scale(sx,sy);ctx.translate(0,-fo*s)}
 function spr(n,at,x,y,s,flip,col,ca){const a=AN[n],fh=a.fh||a.fw;let f=Math.floor(at*a.fps);f=a.l?f%a.n:Math.min(a.n-1,f);let src=IM[a.im||n],sx=f*a.fw,sy=(a.r||0)*fh;
 if(ca>0){tc.width=a.fw;tc.height=fh;tx.imageSmoothingEnabled=false;tx.drawImage(src,sx,sy,a.fw,fh,0,0,a.fw,fh);tx.globalCompositeOperation='source-atop';tx.fillStyle=col;tx.globalAlpha=ca;tx.fillRect(0,0,a.fw,fh);tx.globalAlpha=1;tx.globalCompositeOperation='source-over';src=tc;sx=0;sy=0}
-ctx.save();ctx.translate(Math.round(x),Math.round(y-a.fo*s));if(flip)ctx.scale(-1,1);ctx.drawImage(src,sx,sy,a.fw,fh,-a.fw*s/2,-fh*s/2,a.fw*s,fh*s);ctx.restore()}
+ctx.save();ctx.translate(Math.round(x),Math.round(y-a.fo*s));if(flip)ctx.scale(-1,1);if(a.fx)fxT(a.fx,at,s,a.fo);ctx.drawImage(src,sx,sy,a.fw,fh,-a.fw*s/2,-fh*s/2,a.fw*s,fh*s);ctx.restore()}
 function T(s,x,y,sz,c,al){ctx.font='700 '+sz+'px system-ui,sans-serif';ctx.textAlign=al||'left';ctx.lineWidth=4;ctx.strokeStyle='#000';ctx.strokeText(s,x,y);ctx.fillStyle=c||'#fff';ctx.fillText(s,x,y)}
 function bar(x,y,w,h,v,c){ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x-3,y-3,w+6,h+6);ctx.fillStyle=c;ctx.fillRect(x,y,w*Math.max(0,v),h)}
 function btn(x,y,r,l,c,a){ctx.globalAlpha=a;ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.stroke();ctx.globalAlpha=1;T(l,x,y+6,15,'#fff','center')}
@@ -424,13 +430,13 @@ const VAR=[
 const NEWM=[
 {k:'hrp',S:48,sc:2,n:'Harpi Gurun',bh:2,hp:380,hr:115,sh:33,lh:104,w:'Sayap',ds:['feather','feather','eye'],pd:15,pj:{im:'feather',pw:32,pn:1,ps:1.8,rot:1},i:['Melempar bulu tajam dari udara.','','',''],pn:['Kepala','Sayap','Ekor'],wk:'shock',rs:'earth',el:'shock'},
 {k:'kgl',S:48,sc:2.2,n:'Ksatria Kegelapan',bh:0,hp:820,hr:125,sh:36,lh:113,w:'Helm',ds:['bone','skull','shard','shard'],i:['Menerjang dengan pedang gelap.','','',''],pn:['Helm','Zirah','Jubah'],wk:'poison',rs:'shock',el:'earth'},
-{k:'dgn',S:120,sc:1.45,n:'Naga Pasir',bh:3,hp:1900,hr:170,sh:70,lh:178,w:'Tanduk',ds:['gem','gem','shard','hide','skull'],i:['Penguasa gurun, tiga jurus.','Baca area merahnya!','',''],pn:['Tanduk','Sayap','Ekor'],wk:'ice',rs:'fire',el:'fire'},
+{k:'dgn',S:120,sc:1.45,fx:{idle:'idle',run:'run',atk:'atk',tele:'wind'},n:'Naga Pasir',bh:3,hp:1900,hr:170,sh:70,lh:178,w:'Tanduk',ds:['gem','gem','shard','hide','skull'],i:['Penguasa gurun, tiga jurus.','Baca area merahnya!','',''],pn:['Tanduk','Sayap','Ekor'],wk:'ice',rs:'fire',el:'fire'},
 {k:'wlf',S:48,sc:2.1,n:'Manusia Serigala',bh:0,hp:740,hr:120,sh:30,lh:107,w:'Kepala',ds:['hide','hide','bone'],i:['Menerjang dengan cakar.','','',''],pn:['Kepala','Dada','Ekor'],wk:'fire',rs:'ice',el:'ice'},
 {k:'fox',S:48,sc:2.1,n:'Rubah Roh',bh:1,hp:600,hr:122,sh:33,lh:109,w:'Ekor',ds:['gel','egg','eye','shard'],i:['Mantra api melebar.','Keluar dari lingkaran merah.','',''],pn:['Kepala','Ekor','Dada'],wk:'earth',rs:'ice',el:'fire'},
 {k:'skk',S:48,sc:3.5,n:'Raja Tengkorak',bh:3,hp:2300,hr:165,sh:65,lh:172,w:'Mahkota',ds:['gem','gem','shard','shard','skull'],i:['Penguasa dataran beku, tiga jurus.','Baca area merahnya!','',''],pn:['Mahkota','Tengkorak','Jubah'],wk:'fire',rs:'poison',el:'poison'}];
 function mkVariants(){if(MT.length>15)return;VAR.forEach(v=>{const b=MT[v.b],tc={};Object.keys(AN).filter(n=>n.startsWith(b.k+'_')).forEach(n=>{const a=Object.assign({},AN[n]),im0=a.im||n;if(!tc[im0]){IM[v.k+'__'+im0]=gmap(IM[im0],v.st);tc[im0]=1}a.im=v.k+'__'+im0;AN[v.k+n.slice(b.k.length)]=a});
 MT.push(Object.assign({},b,{n:v.n,k:v.k,hp:v.hp,ds:v.ds,i:v.i,wk:v.wk,rs:v.rs,el:v.el},v.pd?{pd:v.pd}:{}))});
-NEWM.forEach(v=>{const S=v.S,o=S/2;AN[v.k+'_idle']={im:v.k,r:0,n:4,fw:S,fps:5,l:1,fo:o};AN[v.k+'_run']={im:v.k,r:1,n:4,fw:S,fps:9,l:1,fo:o};AN[v.k+'_atk']={im:v.k,r:2,n:4,fw:S,fps:12,fo:o};
+NEWM.forEach(v=>{const S=v.S,o=S/2;AN[v.k+'_idle']={im:v.k,r:0,n:4,fw:S,fps:5,l:1,fo:o};AN[v.k+'_run']={im:v.k,r:1,n:4,fw:S,fps:9,l:1,fo:o};AN[v.k+'_atk']={im:v.k,r:2,n:4,fw:S,fps:12,fo:o};if(v.fx){['idle','run','atk'].forEach(a=>AN[v.k+'_'+a].fx=v.fx[a]);AN[v.k+'_tele']={im:v.k,r:0,n:4,fw:S,fps:12,l:1,fo:o,fx:v.fx.tele}}
 const m={n:v.n,k:v.k,bh:v.bh,hp:v.hp,sc:v.sc,hr:v.hr,sh:v.sh,lh:v.lh,w:v.w,ds:v.ds,i:v.i,pn:v.pn,wk:v.wk,rs:v.rs,el:v.el};if(v.pd)m.pd=v.pd;if(v.pj)m.pj=v.pj;MT.push(m)})}
 function mkTint(){['tree1','tree2','tree3','tree4','bush1','bush2','stump1'].forEach(k=>{const im=IM[k],c=document.createElement('canvas');c.width=im.width;c.height=im.height;const q=c.getContext('2d');q.drawImage(im,0,0);q.globalCompositeOperation='source-atop';q.fillStyle='rgba(228,242,255,.6)';q.fillRect(0,0,c.width,c.height);IM[k+'s']=c;DMS[k+'s']=DMS[k]})}
 function tileTint(im,col){const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const q=c.getContext('2d');q.drawImage(im,0,0);q.globalCompositeOperation='source-atop';q.fillStyle=col;q.fillRect(0,0,c.width,c.height);return c}
